@@ -2,9 +2,9 @@ from CYLGame.Game import NonGridGame
 from CYLGame.Game import Player
 from CYLGame.Game import GameFrame
 from CYLGame import GameLanguage
-from SensorGame import SensorGame, SensorPlayer
-from SensorGame import SensorSanitizers
-from SensorGame import rotate_point, compute_vector, rad2deg, deg2rad
+from CYLGame.SensorGame import SensorGame, SensorPlayer
+from CYLGame.SensorGame import SensorSanitizers
+from CYLGame.SensorGame import rotate_point, rad2deg, deg2rad
 import math
 import random
 # BEDUG
@@ -280,13 +280,13 @@ class TanksGame(SensorGame):
     TELEPORT_ENABLED = False
 
     # Some in-game constants
-    TANK_MAX_SENSORS = 10
+    MAX_SENSORS = 10
     TANK_RADIUS = 7.5
-    TANK_SENSOR_RANGE = 100
+    MAX_SENSOR_RANGE = 100
     TANK_CANNON_RECHARGE = 2 # Turns to recharge cannon 
     TANK_ENABLE_TELEPORT = 1
     TANK_TELEPORT_RECHARGE = 60
-    TANK_CANNON_RANGE = (TANK_SENSOR_RANGE / 2)
+    TANK_CANNON_RANGE = (MAX_SENSOR_RANGE / 2)
     TANK_MAX_ACCEL = 35
     TANK_MAX_TURRET_ROT = (TAU/8)
     TANK_TOP_SPEED = 7
@@ -323,7 +323,7 @@ class TanksGame(SensorGame):
     # (Sensor range + tank radius)^2
     # If the distance^2 to the center of a tank <= TANK_SENSOR_ADJ2,
     # that tank is within sensor range.
-    TANK_SENSOR_ADJ2 = ((TANK_SENSOR_RANGE + TANK_RADIUS) * (TANK_SENSOR_RANGE + TANK_RADIUS))
+    TANK_SENSOR_ADJ2 = ((MAX_SENSOR_RANGE + TANK_RADIUS) * (MAX_SENSOR_RANGE + TANK_RADIUS))
 
     TANK_CANNON_ADJ2 = ((TANK_CANNON_RANGE + TANK_RADIUS) * (TANK_CANNON_RANGE + TANK_RADIUS))
 
@@ -352,28 +352,6 @@ class TanksGame(SensorGame):
         else:
             return TanksGame.spacing[type1 + type1]
 
-    def create_new_player(self, prog, options):
-        if options:
-            sensors = options.get("sensors", [])
-            if sensors and len(sensors) > TanksGame.TANK_MAX_SENSORS:
-                program_error("create_new_player(): Up to %d sensots allowed. %d given." % (TanksGame.TANK_MAX_SENSORS, len(sensors)))
-            sanitized_sensors = []
-            for sensor in sensors:
-                san_sensor = {}
-                for key, func in self.SENSOR_PROPS.iteritems():
-                    if key not in sensor:
-                        program_error("sensor missing %s prop!" % (key))
-                    san_sensor[key] = func(sensor[key])
-                sanitized_sensors.append(san_sensor)
-
-            color = options.get("color", None)
-            san_color = SensorSanitizers.san_color(color)
-        else:
-            sanitized_sensors = []
-            san_color = None
-        new_player = Tank(self, prog, sanitized_sensors, san_color)
-        self.players.append(new_player)
-        return new_player
 
     def init_board(self):
         # (x, y, radius, obj_type)
@@ -405,6 +383,30 @@ class TanksGame(SensorGame):
                 placed_circles.append((x, y, self.TANK_RADIUS, self.OBJ_TYPES["tank"]))
                 i += 1
         self.do_sensors()
+
+    def create_new_player(self, prog, options):
+        if options:
+            sensors = options.get("sensors", [])
+            if sensors and len(sensors) > self.MAX_SENSORS:
+                program_error("create_new_player(): Up to %d sensors allowed. %d given." % (self.MAX_SENSORS, len(sensors)))
+            sanitized_sensors = []
+            for sensor in sensors:
+                san_sensor = {}
+                for key, func in self.SENSOR_PROPS.iteritems():
+                    if key not in sensor:
+                        program_error("sensor missing %s prop!" % (key))
+                    san_sensor[key] = func(sensor[key])
+                sanitized_sensors.append(san_sensor)
+
+            color = options.get("color", None)
+            san_color = SensorSanitizers.san_color(color)
+        else:
+            sanitized_sensors = []
+            san_color = None
+        new_player = Tank(self, prog, sanitized_sensors, san_color)
+        self.players.append(new_player)
+        return new_player
+
 
 # BEDUG
 #    def init_board(self):
@@ -438,7 +440,7 @@ class TanksGame(SensorGame):
             for player2 in self.players[i + 1:]:
                 if player2.killer:
                     continue
-                dist_sq, vector = compute_vector(player, player2)
+                dist_sq, vector = self.compute_vector(player, player2)
                 player.fire_and_collision(player2, dist_sq, vector)
                 vector[0] = -vector[0]
                 vector[1] = -vector[1]
