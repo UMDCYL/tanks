@@ -447,7 +447,7 @@ class TanksGame(NonGridGame):
     TANK_MAX_SENSORS = 10
     TANK_RADIUS = 7.5
     TANK_SENSOR_RANGE = 100
-    TANK_CANNON_RECHARGE = 20 # Turns to recharge cannon 
+    TANK_CANNON_RECHARGE = 2 # Turns to recharge cannon 
     TANK_ENABLE_TELEPORT = 1
     TANK_TELEPORT_RECHARGE = 60
     TANK_CANNON_RANGE = (TANK_SENSOR_RANGE / 2)
@@ -495,7 +495,7 @@ class TanksGame(NonGridGame):
     SPACING = 160
 
     MEMORY_SIZE = 10
-    num_defaults = 1
+    num_defaults = 8
 
     def __init__(self, random):
         self.random = random
@@ -539,50 +539,50 @@ class TanksGame(NonGridGame):
         self.players.append(new_player)
         return new_player
 
-#    def init_board(self):
-#        # (x, y, radius, obj_type)
-#        placed_circles = []
-#
-#        # BEDUG
-#        self.players[0].is_human = True
-#        # BEDUG
-#
-#        # place tanks
-#        # randomness doesn't matter
-#        #self.random.shuffle(self.players)
-#        i = 0
-#        while i < len(self.players):
-#            x = math.floor(self.random.random()*self.SCREEN_WIDTH)
-#            y = math.floor(self.random.random()*self.SCREEN_HEIGHT)
-#            overlaps = False
-#            for circle in placed_circles:
-#                dist_sq = (circle[0] - x)**2 + (circle[1] - y)**2
-#                min_dist_sq = (circle[2] + self.TANK_RADIUS + self.get_spacing(self.OBJ_TYPES["tank"], circle[3]))**2
-#                if dist_sq <= min_dist_sq:
-#                    overlaps = True
-#                    break
-#
-#            if not overlaps:
-#                self.players[i].position[0] = x
-#                self.players[i].position[1] = y
-#                self.players[i].angle = self.random.random()*TAU
-#                placed_circles.append((x, y, self.TANK_RADIUS, self.OBJ_TYPES["tank"]))
-#                i += 1
-#        self.do_sensors()
+    def init_board(self):
+        # (x, y, radius, obj_type)
+        placed_circles = []
+
+        # BEDUG
+        self.players[0].is_human = True
+        # BEDUG
+
+        # place tanks
+        # randomness doesn't matter
+        #self.random.shuffle(self.players)
+        i = 0
+        while i < len(self.players):
+            x = math.floor(self.random.random()*self.SCREEN_WIDTH)
+            y = math.floor(self.random.random()*self.SCREEN_HEIGHT)
+            overlaps = False
+            for circle in placed_circles:
+                dist_sq = (circle[0] - x)**2 + (circle[1] - y)**2
+                min_dist_sq = (circle[2] + self.TANK_RADIUS + self.get_spacing(self.OBJ_TYPES["tank"], circle[3]))**2
+                if dist_sq <= min_dist_sq:
+                    overlaps = True
+                    break
+
+            if not overlaps:
+                self.players[i].position[0] = x
+                self.players[i].position[1] = y
+                self.players[i].angle = self.random.random()*TAU
+                placed_circles.append((x, y, self.TANK_RADIUS, self.OBJ_TYPES["tank"]))
+                i += 1
+        self.do_sensors()
 
 # BEDUG
-    def init_board(self):
-        assert len(self.players) >= 2
-
-        self.players[0].position[0] = 50
-        self.players[0].position[1] = 50
-        self.players[0].angle = TAU / 4.0
-
-        self.players[1].position[0] = 50
-        self.players[1].position[1] = 70
-        self.players[1].angle = 0.1
-
-        self.do_sensors()
+#    def init_board(self):
+#        assert len(self.players) >= 2
+#
+#        self.players[0].position[0] = 50
+#        self.players[0].position[1] = 50
+#        self.players[0].angle = TAU / 4.0
+#
+#        self.players[1].position[0] = 50
+#        self.players[1].position[1] = 70
+#        self.players[1].angle = 0.1
+#
+#        self.do_sensors()
 # BEDUG
 
     def do_sensors(self):
