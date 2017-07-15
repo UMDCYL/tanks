@@ -696,10 +696,7 @@ class TanksGame(NonGridGame):
     @staticmethod
     def default_prog_for_bot(language):
         if language == GameLanguage.LITTLEPY:
-            return ""
-        # BEDUG
-            #return open("bot.lp", "r").read()
-        # BEDUG
+            return open("bot.lp", "r").read()
 
 
 if __name__ == '__main__':
